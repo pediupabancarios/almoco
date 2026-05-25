@@ -1,0 +1,21 @@
+{
+  "name": "Almoço Hemocentro",
+  "short_name": "Almoço HC",
+  "description": "Solicitação de almoço para plantonistas do Hemocentro",
+  "start_url": "/almoco/",
+  "scope": "/almoco/",
+  "display": "standalone",
+  "background_color": "#FAF7F2",
+  "theme_color": "#C0272D",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "productivity"],
+  "lang": "pt-BR"
+}
