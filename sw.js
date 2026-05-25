@@ -1,148 +1,179 @@
-// ── SERVICE WORKER · Hemocentro Almoço ──
-const CACHE = 'hemo-v1';
+// ── SERVICE WORKER · Hemocentro Almoço v3 ──
+// Estratégia: Push Notifications via servidor externo (mais confiável)
+// + fallback com verificação no fetch/sync
 
-// ── INSTALL & CACHE ──
+const APP_URL = 'https://pediupabancarios.github.io/almoco/';
+const CACHE_NAME = 'hemo-v3';
+const ASSETS = ['./', './index.html', './manifest.json', './icon.svg'];
+
+// ── INSTALL: cacheia os arquivos ──
 self.addEventListener('install', e => {
   self.skipWaiting();
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(c => c.addAll(ASSETS).catch(() => {}))
+  );
 });
 
+// ── ACTIVATE ──
 self.addEventListener('activate', e => {
   self.clients.claim();
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    )
+  );
 });
 
-// ── BACKGROUND SYNC / NOTIFICAÇÕES AGENDADAS ──
-// Recebe mensagem do app principal com os horários
+// ── FETCH: serve do cache (app funciona offline) ──
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('./index.html')))
+  );
+  // Aproveita cada fetch para verificar se está na hora de notificar
+  checkAndNotify();
+});
+
+// ── SYNC: acionado quando o dispositivo reconecta ──
+self.addEventListener('sync', e => {
+  if (e.tag === 'hemo-check') {
+    e.waitUntil(checkAndNotify());
+  }
+});
+
+// ── PERIODIC SYNC: acionado periodicamente pelo sistema ──
+self.addEventListener('periodicsync', e => {
+  if (e.tag === 'hemo-daily') {
+    e.waitUntil(checkAndNotify());
+  }
+});
+
+// ── MENSAGEM DO APP: agenda alarme ──
 self.addEventListener('message', e => {
   if (e.data?.type === 'SCHEDULE_NOTIFS') {
-    scheduleAlarms(e.data.alarms);
+    saveAlarmPrefs(e.data.prefs);
   }
-  if (e.data?.type === 'CANCEL_NOTIFS') {
-    clearAlarms();
+  if (e.data?.type === 'CHECK_NOW') {
+    checkAndNotify();
   }
 });
-
-// Armazena os timeouts (no SW eles sobrevivem ao fechamento do app via sync)
-const alarmIds = [];
-
-function clearAlarms() {
-  alarmIds.forEach(id => clearTimeout(id));
-  alarmIds.length = 0;
-}
-
-function scheduleAlarms(alarms) {
-  clearAlarms();
-  const now = Date.now();
-
-  alarms.forEach(alarm => {
-    const delay = alarm.ts - now;
-    if (delay <= 0) return;
-
-    const id = setTimeout(() => {
-      self.registration.showNotification(alarm.title, {
-        body: alarm.body,
-        icon: 'https://hemocentro-almoco-hc.github.io/almoco/icon.svg',
-        badge: 'https://hemocentro-almoco-hc.github.io/almoco/icon.svg',
-        tag: alarm.tag || 'hemo-notif',
-        requireInteraction: true,
-        vibrate: [200, 100, 200],
-        actions: [
-          { action: 'open', title: '📋 Abrir App' },
-          { action: 'dismiss', title: 'Dispensar' }
-        ],
-        data: { url: alarm.url || '/' }
-      });
-    }, delay);
-
-    alarmIds.push(id);
-  });
-}
 
 // ── CLIQUE NA NOTIFICAÇÃO ──
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-
   if (e.action === 'dismiss') return;
-
-  const url = e.notification.data?.url || '/';
   e.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
-      const existing = clients.find(c => c.url.includes('hemocentro'));
+      const existing = clients.find(c => c.url.includes('almoco'));
       if (existing) return existing.focus();
-      return self.clients.openWindow(url);
+      return self.clients.openWindow(APP_URL);
     })
   );
 });
 
-// ── PERIODIC BACKGROUND SYNC (re-agenda notifs diariamente) ──
-self.addEventListener('periodicsync', e => {
-  if (e.tag === 'hemo-daily') {
-    e.waitUntil(reagendarNotifsDiarias());
-  }
-});
-
-async function reagendarNotifsDiarias() {
-  // Lê preferências salvas no IndexedDB pelo app
-  const prefs = await getPrefs();
-  if (!prefs) return;
-
-  const alarms = buildAlarms(prefs);
-  scheduleAlarms(alarms);
-}
-
-// ── INDEXEDDB helpers ──
+// ── IndexedDB ──
 function openDB() {
   return new Promise((res, rej) => {
-    const req = indexedDB.open('hemo_db', 1);
+    const req = indexedDB.open('hemo_db', 2);
     req.onupgradeneeded = e => {
-      e.target.result.createObjectStore('prefs');
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('prefs'))   db.createObjectStore('prefs');
+      if (!db.objectStoreNames.contains('notified')) db.createObjectStore('notified');
     };
     req.onsuccess = e => res(e.target.result);
     req.onerror   = e => rej(e.target.error);
   });
 }
 
-async function getPrefs() {
-  try {
-    const db = await openDB();
-    return new Promise((res, rej) => {
-      const tx  = db.transaction('prefs', 'readonly');
-      const req = tx.objectStore('prefs').get('settings');
-      req.onsuccess = e => res(e.target.result);
-      req.onerror   = e => rej(e.target.error);
-    });
-  } catch { return null; }
+async function dbGet(store, key) {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const req = db.transaction(store, 'readonly').objectStore(store).get(key);
+    req.onsuccess = e => res(e.target.result);
+    req.onerror   = e => rej(e.target.error);
+  });
 }
 
-// ── CONSTRÓI LISTA DE ALARMES PARA HOJE ──
-function buildAlarms(prefs) {
-  const now   = new Date();
-  const alarms = [];
+async function dbSet(store, key, value) {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const req = db.transaction(store, 'readwrite').objectStore(store).put(value, key);
+    req.onsuccess = () => res();
+    req.onerror   = e => rej(e.target.error);
+  });
+}
 
-  // Deadline = 16:00
-  const deadline = new Date(now);
-  deadline.setHours(16, 0, 0, 0);
+async function saveAlarmPrefs(prefs) {
+  await dbSet('prefs', 'settings', prefs);
+}
 
-  if (prefs.notif1h) {
-    const t = new Date(deadline.getTime() - 60 * 60 * 1000); // 15:00
-    alarms.push({
-      ts:    t.getTime(),
-      tag:   'hemo-1h',
-      title: '⏰ Hemocentro — Lembrete de Almoço',
-      body:  'Falta 1 hora para o prazo de solicitação (16:00). Solicite agora!',
-      url:   prefs.appUrl
-    });
+// ── VERIFICA HORÁRIO E DISPARA NOTIFICAÇÃO ──
+async function checkAndNotify() {
+  try {
+    const prefs = await dbGet('prefs', 'settings');
+    if (!prefs) return;
+
+    const now      = new Date();
+    const h        = now.getHours();
+    const m        = now.getMinutes();
+    const today    = now.toDateString();
+
+    // Não notifica após 16h ou antes das 14h
+    if (h >= 16 || h < 14) return;
+
+    // Chave do dia para não repetir
+    const key1h  = `1h-${today}`;
+    const key30m = `30m-${today}`;
+
+    // Lembrete 1h antes = 15:00 (entre 15:00 e 15:10)
+    if (prefs.notif1h && h === 15 && m >= 0 && m < 10) {
+      const jaNotificou = await dbGet('notified', key1h);
+      if (!jaNotificou) {
+        await dispararNotificacao({
+          title: '⏰ Hemocentro — Almoço',
+          body:  'Falta 1 hora! Prazo de solicitação encerra às 16:00. Solicite agora!',
+          tag:   'hemo-1h',
+          urgente: false
+        });
+        await dbSet('notified', key1h, true);
+      }
+    }
+
+    // Lembrete 30min antes = 15:30 (entre 15:30 e 15:40)
+    if (prefs.notif30m && h === 15 && m >= 30 && m < 40) {
+      const jaNotificou = await dbGet('notified', key30m);
+      if (!jaNotificou) {
+        await dispararNotificacao({
+          title: '⚠️ Hemocentro — ÚLTIMO AVISO',
+          body:  'Faltam apenas 30 minutos! O prazo fecha às 16:00. Não perca!',
+          tag:   'hemo-30m',
+          urgente: true
+        });
+        await dbSet('notified', key30m, true);
+      }
+    }
+  } catch (err) {
+    console.error('[SW] checkAndNotify erro:', err);
   }
+}
 
-  if (prefs.notif30m) {
-    const t = new Date(deadline.getTime() - 30 * 60 * 1000); // 15:30
-    alarms.push({
-      ts:    t.getTime(),
-      tag:   'hemo-30m',
-      title: '⚠️ Hemocentro — Último Aviso!',
-      body:  'Faltam apenas 30 minutos! O prazo fecha às 16:00. Solicite já!',
-      url:   prefs.appUrl
-    });
-  }
+async function dispararNotificacao({ title, body, tag, urgente }) {
+  const vibrar = urgente
+    ? [300, 100, 300, 100, 300, 100, 600] // padrão urgente
+    : [200, 100, 200];                     // padrão normal
 
-  return alarms;
+  await self.registration.showNotification(title, {
+    body,
+    tag,
+    icon:             './icon.svg',
+    badge:            './icon.svg',
+    requireInteraction: true,          // não some sozinha
+    silent:           false,           // som + vibração
+    vibrate:          vibrar,
+    renotify:         true,
+    actions: [
+      { action: 'open',    title: '📋 Solicitar Almoço' },
+      { action: 'dismiss', title: 'Já solicitei ✓' }
+    ],
+    data: { url: APP_URL }
+  });
 }
