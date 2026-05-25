@@ -869,8 +869,12 @@ function formatDate(d) {
 // ── INDEXEDDB ──
 function openDB() {
   return new Promise((res, rej) => {
-    const req = indexedDB.open('hemo_db', 1);
-    req.onupgradeneeded = e => e.target.result.createObjectStore('prefs');
+    const req = indexedDB.open('hemo_db', 2);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('prefs'))    db.createObjectStore('prefs');
+      if (!db.objectStoreNames.contains('notified')) db.createObjectStore('notified');
+    };
     req.onsuccess = e => res(e.target.result);
     req.onerror   = e => rej(e.target.error);
   });
@@ -904,52 +908,38 @@ let swReg = null;
 async function registerSW() {
   if (!('serviceWorker' in navigator)) return;
   try {
-    swReg = await navigator.serviceWorker.register('sw.js', { scope: './' });
+    swReg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
     console.log('[PWA] Service Worker registrado.');
+
+    // Registra periodic sync para acordar o SW de hora em hora
+    if ('periodicSync' in swReg) {
+      try {
+        await swReg.periodicSync.register('hemo-daily', { minInterval: 60 * 60 * 1000 });
+        console.log('[PWA] Periodic sync registrado.');
+      } catch (e) { console.log('[PWA] periodicSync indisponível:', e); }
+    }
+
+    // Registra background sync de fallback
+    if ('sync' in swReg) {
+      try { await swReg.sync.register('hemo-check'); } catch (e) {}
+    }
   } catch (err) {
     console.warn('[PWA] SW não registrado:', err);
   }
 }
 
-// ── CONSTRÓI ALARMES DO DIA ──
-function buildAlarms(prefs) {
-  const now      = new Date();
-  const deadline = new Date(); deadline.setHours(16, 0, 0, 0);
-  const alarms   = [];
-  const appUrl   = location.href;
-
-  if (prefs.notif1h) {
-    const t = new Date(deadline.getTime() - 60 * 60 * 1000); // 15:00
-    if (t > now) alarms.push({
-      ts: t.getTime(), tag: 'hemo-1h',
-      title: '⏰ Hemocentro — Lembrete de Almoço',
-      body:  'Falta 1 hora para o prazo (16:00). Solicite seu almoço agora!',
-      url:   appUrl
-    });
-  }
-  if (prefs.notif30m) {
-    const t = new Date(deadline.getTime() - 30 * 60 * 1000); // 15:30
-    if (t > now) alarms.push({
-      ts: t.getTime(), tag: 'hemo-30m',
-      title: '⚠️ Hemocentro — Último Aviso!',
-      body:  'Faltam 30 minutos! O prazo fecha às 16:00. Não esqueça!',
-      url:   appUrl
-    });
-  }
-  return alarms;
-}
-
-// ── ENVIA ALARMES AO SERVICE WORKER ──
+// ── ENVIA PREFS AO SERVICE WORKER ──
 async function sendAlarmsToSW() {
   if (!swReg) return;
-  const prefs  = await loadPrefs();
-  const alarms = buildAlarms(prefs);
-  if (!alarms.length) return;
-
-  const sw = swReg.active || swReg.installing || swReg.waiting;
+  const prefs = await loadPrefs();
+  const sw = swReg.active || swReg.waiting || swReg.installing;
   if (sw) {
-    sw.postMessage({ type: 'SCHEDULE_NOTIFS', alarms });
-    console.log('[PWA] Alarmes enviados ao SW:', alarms.length);
+    sw.postMessage({ type: 'SCHEDULE_NOTIFS', prefs: { ...prefs, appUrl: location.href } });
+    console.log('[PWA] Prefs enviadas ao SW');
+  }
+  // Pede ao SW para checar agora mesmo
+  if (swReg.active) {
+    swReg.active.postMessage({ type: 'CHECK_NOW' });
   }
 }
 
