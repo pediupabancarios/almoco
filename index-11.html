@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Almoço · Hemocentro</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1A3A6B">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Almoço HC">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue-dark:  #0D2548;
+  --blue:       #1A3A6B;
+  --blue-mid:   #1E4A8A;
+  --blue-light: #2E6FD4;
+  --green:      #1E7A3E;
+  --green-bg:   #E8F5EE;
+  --green-text: #1E7A3E;
+  --purple:     #6B3FA0;
+  --purple-bg:  #F0E8FF;
+  --orange:     #E07020;
+  --orange-bg:  #FFF3E0;
+  --yellow-bg:  #FFFBEA;
+  --yellow-border: #F5C842;
+  --card-bg:    #FFFFFF;
+  --page-bg:    #F0F4FA;
+  --text:       #1A2A3A;
+  --muted:      #6A7A8A;
+  --border:     #E0E8F0;
+  --radius:     18px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--page-bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+.app-header {
+  background: linear-gradient(160deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.app-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='400' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='350' cy='50' r='120' fill='rgba(255,255,255,0.04)'/%3E%3Ccircle cx='50' cy='180' r='80' fill='rgba(255,255,255,0.03)'/%3E%3C/svg%3E") no-repeat center;
+  background-size: cover;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 52px 20px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.header-menu { font-size: 22px; color: rgba(255,255,255,0.8); background:none; border:none; cursor:pointer; }
+
+.header-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.3px;
+}
+
+.header-dot {
+  font-size: 11px;
+  color: #4AE88A;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.header-dot::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #4AE88A;
+  display: inline-block;
+}
+
+.header-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--blue-light);
+  color: #fff;
+  font-weight: 800;
+  font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+/* hero date card */
+.hero-card {
+  margin: 20px 16px 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(10px);
+}
+
+.hero-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 4px;
+}
+
+.hero-day {
+  font-size: 32px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.hero-date {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  margin-top: 4px;
+}
+
+.hero-emoji {
+  width: 64px; height: 64px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* bottom wave */
+.header-wave {
+  height: 32px;
+  margin-top: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.header-wave svg { display: block; }
+
+/* ── CONTENT ── */
+.content {
+  padding: 16px 16px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  padding: 4px 0 2px;
+}
+
+/* ── ALERT CARD (prazo aberto) ── */
+.alert-card {
+  background: var(--yellow-bg);
+  border: 2px solid var(--yellow-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from { opacity:0; transform: translateY(-6px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+.alert-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--orange);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.alert-body {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.alert-body strong { color: var(--text); }
+
+.btn-solicitar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s, opacity 0.15s;
+  color: #fff;
+}
+
+.btn-solicitar:active { transform: scale(0.97); }
+.btn-solicitar.purple { background: var(--purple); }
+.btn-solicitar.green  { background: var(--green); }
+
+/* countdown inside alert */
+.countdown-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.countdown-box {
+  background: rgba(0,0,0,0.06);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--orange);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+}
+
+.countdown-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* ── RULES CARD ── */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.card-header-row {
+  padding: 16px 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-icon {
+  font-size: 20px;
+}
+
+.card-header-text h3 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.card-header-text p {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+/* rule row */
+.rule-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.rule-row:last-child { border-bottom: none; }
+.rule-row.today-row { background: #EEF4FF; }
+
+.rule-emoji-wrap {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.rule-emoji-wrap.work { background: #FFF0E0; }
+.rule-emoji-wrap.fds  { background: #F0E8FF; }
+
+.rule-info { flex: 1; }
+
+.rule-day {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-hoje {
+  background: var(--blue-light);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rule-when {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.rule-when strong { color: var(--text); }
+
+.badge-tipo {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.badge-tipo.semana { background: var(--green-bg); color: var(--green-text); }
+.badge-tipo.fds    { background: var(--purple-bg); color: var(--purple); }
+
+/* ── FORM LINKS ── */
+.form-link-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.form-link-row:last-child { border-bottom: none; }
+.form-link-row:active { background: var(--page-bg); }
+
+.form-link-emoji {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.form-link-emoji.work { background: #FFF0E0; }
+.form-link-emoji.fds  { background: #F0E8FF; }
+
+.form-link-info { flex: 1; }
+
+.form-link-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.form-link-sub {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+.form-link-open {
+  font-size: 12px;
+  font-weight: 700;
+  color: #2E6FD4;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.form-arrow {
+  font-size: 18px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.form-arrow.work   { color: var(--green); }
+.form-arrow.fds    { color: var(--purple); }
+
+/* ── NOTIF CARD ── */
+.notif-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.notif-row:last-child { border-bottom: none; }
+
+.notif-info h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.notif-info p {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.toggle {
+  position: relative;
+  width: 50px; height: 28px;
+  flex-shrink: 0;
+}
+
+.toggle input { opacity:0; width:0; height:0; }
+
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: #D0D8E4;
+  border-radius: 28px;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.toggle-thumb {
+  position: absolute;
+  width: 22px; height: 22px;
+  background: white;
+  border-radius: 50%;
+  top: 3px; left: 3px;
+  transition: transform 0.25s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  pointer-events: none;
+}
+
+.toggle input:checked ~ .toggle-track { background: var(--blue-light); }
+.toggle input:checked ~ .toggle-thumb { transform: translateX(22px); }
+
+/* notif activate btn */
+.btn-notif {
+  margin: 0 16px 16px;
+  width: calc(100% - 32px);
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: var(--blue-light);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.2s;
+}
+
+.btn-notif:active { opacity: 0.85; }
+.btn-notif.success { background: var(--green); }
+
+.notif-ok {
+  display: none;
+  margin: 0 16px 16px;
+  padding: 12px 16px;
+  background: var(--green-bg);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green-text);
+  text-align: center;
+}
+
+.notif-ok.show { display: block; }
+
+/* ── INSTALL CARD ── */
+#installCard { display: none; }
+
+.btn-install {
+  margin: 0 16px 16px;
+  width: calc(100% - 32px);
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: var(--orange);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--text);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 999;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* expired overlay */
+.expired-banner {
+  display: none;
+  background: #F8F8F8;
+  border: 2px solid #DDD;
+  border-radius: var(--radius);
+  padding: 18px;
+  text-align: center;
+}
+
+.expired-banner.show { display: block; }
+.expired-banner h3 { font-size: 16px; font-weight: 800; color: #888; }
+.expired-banner p  { font-size: 13px; color: #AAA; margin-top: 4px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="app-header">
+  <div class="header-top">
+    <div>
+      <div class="header-title">Almoço</div>
+      <div class="header-dot">Tempo Real</div>
+    </div>
+    <div class="header-avatar" id="avatarEl">HC</div>
+  </div>
+
+  <div class="hero-card">
+    <div>
+      <div class="hero-label">HOJE É</div>
+      <div class="hero-day" id="heroDayName">Carregando</div>
+      <div class="hero-date" id="heroDate">—</div>
+    </div>
+    <div class="hero-emoji" id="heroEmoji">🍽️</div>
+  </div>
+
+  <div class="header-wave">
+    <svg viewBox="0 0 390 32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" width="100%" height="32">
+      <path d="M0 32 Q195 0 390 32 L390 32 L0 32 Z" fill="#F0F4FA"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ── CONTENT ── -->
+<div class="content">
+
+  <!-- ALERTA PRAZO HOJE -->
+  <div id="alertsContainer"></div>
+
+  <!-- PRAZO ENCERRADO -->
+  <div class="expired-banner" id="expiredBanner">
+    <h3>🔒 Prazo encerrado por hoje</h3>
+    <p>As solicitações abrem novamente amanhã às 00:00</p>
+  </div>
+
+  <!-- REGRAS -->
+  <div class="section-label">Quando solicitar cada dia</div>
+
+  <div class="card" id="rulesCard">
+    <div class="card-header-row">
+      <span class="card-icon">📋</span>
+      <div class="card-header-text">
+        <h3>Quando solicitar cada dia</h3>
+        <p>Regras de solicitação de almoço</p>
+      </div>
+    </div>
+    <!-- rows inserted by JS -->
+    <div id="rulesBody"></div>
+  </div>
+
+  <!-- FORMULÁRIOS -->
+  <div class="section-label">Formulários de Solicitação</div>
+
+  <div class="card">
+    <a class="form-link-row" href="https://docs.google.com/forms/d/e/1FAIpQLSegvsmWyBw4spVH-hlgBEgxa16dOeULkzTQAd31KZTTmafLRQ/viewform" target="_blank">
+      <div class="form-link-emoji work">💼</div>
+      <div class="form-link-info">
+        <div class="form-link-title">Segunda a Sexta-feira</div>
+        <div class="form-link-sub">Formulário para dias de semana</div>
+        <div class="form-link-open">🔗 Abrir Google Forms</div>
+      </div>
+      <div class="form-arrow work">→</div>
+    </a>
+    <a class="form-link-row" href="https://docs.google.com/forms/d/e/1FAIpQLSeHttSks-j7juyqBTMe3yZs6Xg3TbTQdtoAzEvVUMMq9kRHrg/viewform" target="_blank">
+      <div class="form-link-emoji fds">🌅</div>
+      <div class="form-link-info">
+        <div class="form-link-title">Sábado e Domingo</div>
+        <div class="form-link-sub">Formulário para final de semana</div>
+        <div class="form-link-open">🔗 Abrir Google Forms</div>
+      </div>
+      <div class="form-arrow fds">→</div>
+    </a>
+  </div>
+
+  <!-- NOTIFICAÇÕES -->
+  <div class="section-label">Lembretes</div>
+
+  <div class="card" id="notifCard">
+    <div class="notif-row">
+      <div class="notif-info">
+        <h4>⏰ 1 hora antes (15:00)</h4>
+        <p>Lembrete principal do prazo</p>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle1h" checked onchange="handleToggle(this,'1h')">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+    <div class="notif-row">
+      <div class="notif-info">
+        <h4>⚠️ 30 min antes (15:30)</h4>
+        <p>Aviso de urgência com vibração</p>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle30m" onchange="handleToggle(this,'30m')">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+
+    <button class="btn-notif" id="notifBtn" onclick="requestNotifPermission()">
+      🔔 Ativar Notificações
+    </button>
+    <div class="notif-ok" id="notifOk">
+      ✅ Notificações ativas — você será lembrado mesmo com o app fechado
+    </div>
+  </div>
+
+  <!-- INSTALAR -->
+  <div class="card" id="installCard">
+    <div class="card-header-row">
+      <span class="card-icon">📲</span>
+      <div class="card-header-text">
+        <h3>Instalar no celular</h3>
+        <p>Acesso rápido pela tela inicial</p>
+      </div>
+    </div>
+    <button class="btn-install" onclick="installPWA()">
+      📲 Adicionar à tela inicial
+    </button>
+  </div>
+
+</div><!-- /content -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+// ── LINKS ──
+const FORM_SEMANA = 'https://docs.google.com/forms/d/e/1FAIpQLSegvsmWyBw4spVH-hlgBEgxa16dOeULkzTQAd31KZTTmafLRQ/viewform';
+const FORM_FDS    = 'https://docs.google.com/forms/d/e/1FAIpQLSeHttSks-j7juyqBTMe3yZs6Xg3TbTQdtoAzEvVUMMq9kRHrg/viewform';
+const APP_URL     = 'https://pediupabancarios.github.io/almoco/';
+
+// ── REGRAS: qual dia solicitar para qual refeição ──
+// [diaDaSemana(0=dom), nomeDia, solicitar_em, tipo, emoji]
+const REGRAS = [
+  { dia: 1, nome: 'Segunda-feira',  quando: 'Sexta-feira ou Sábado', tipo: 'semana', emoji: '💼' },
+  { dia: 2, nome: 'Terça-feira',    quando: 'Segunda-feira até 16h', tipo: 'semana', emoji: '💼' },
+  { dia: 3, nome: 'Quarta-feira',   quando: 'Terça-feira até 16h',   tipo: 'semana', emoji: '💼' },
+  { dia: 4, nome: 'Quinta-feira',   quando: 'Quinta-feira até 16h',  tipo: 'semana', emoji: '💼' },
+  { dia: 5, nome: 'Sexta-feira',    quando: 'Quinta-feira até 16h',  tipo: 'semana', emoji: '💼' },
+  { dia: 6, nome: 'Sábado',         quando: 'Sexta-feira até 16h',   tipo: 'fds',    emoji: '🌅' },
+  { dia: 0, nome: 'Domingo',        quando: 'Sábado até 16h',        tipo: 'fds',    emoji: '🌅' },
+];
+
+// ── HELPERS ──
+function showToast(msg, dur=3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+function pad(n) { return String(n).padStart(2,'0'); }
+
+const DIAS_PT   = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+const MESES_PT  = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const EMOJIS_DIA = { 0:'🌙', 1:'💼', 2:'💼', 3:'💼', 4:'💼', 5:'🎉', 6:'🌅' };
+
+// ── HEADER ──
+function renderHeader() {
+  const now  = new Date();
+  const d    = now.getDay();
+  const h    = now.getHours();
+  const m    = now.getMinutes();
+  document.getElementById('heroDayName').textContent = DIAS_PT[d];
+  document.getElementById('heroDate').textContent =
+    `${now.getDate()} de ${MESES_PT[now.getMonth()]} de ${now.getFullYear()} · ${pad(h)}:${pad(m)}`;
+  document.getElementById('heroEmoji').textContent = EMOJIS_DIA[d];
+}
+
+// ── REGRAS TABELA ──
+function renderRules() {
+  const today = new Date().getDay();
+  const body  = document.getElementById('rulesBody');
+  // Reordena colocando hoje primeiro
+  const sorted = [...REGRAS].sort((a,b) => {
+    if (a.dia === today) return -1;
+    if (b.dia === today) return 1;
+    return 0;
+  });
+
+  body.innerHTML = sorted.map(r => `
+    <div class="rule-row ${r.dia === today ? 'today-row' : ''}">
+      <div class="rule-emoji-wrap ${r.tipo}"><span>${r.emoji}</span></div>
+      <div class="rule-info">
+        <div class="rule-day">
+          ${r.nome}
+          ${r.dia === today ? '<span class="badge-hoje">HOJE</span>' : ''}
+        </div>
+        <div class="rule-when">Solicitar em: <strong>${r.quando}</strong></div>
+      </div>
+      <span class="badge-tipo ${r.tipo}">${r.tipo === 'semana' ? 'Semana' : 'F. Semana'}</span>
+    </div>
+  `).join('');
+}
+
+// ── ALERTAS DE PRAZO ABERTO ──
+// Lógica: hoje solicita-se para amanhã (e segunda = sábado/domingo)
+function getDiasParaSolicitar() {
+  const today = new Date().getDay();
+  // Quais refeições podem ser solicitadas HOJE?
+  // Uma refeição pode ser solicitada no dia antes (ou sexta para segunda)
+  return REGRAS.filter(r => {
+    // dia anterior = (r.dia - 1 + 7) % 7, exceto segunda que é sex ou sab
+    if (r.dia === 1) return today === 5 || today === 6; // segunda: solicitar sex ou sab
+    return (r.dia - 1 + 7) % 7 === today;
+  });
+}
+
+function renderAlerts() {
+  const now     = new Date();
+  const h       = now.getHours();
+  const prazoOk = h < 16;
+  const container = document.getElementById('alertsContainer');
+  const expired   = document.getElementById('expiredBanner');
+
+  if (!prazoOk) {
+    container.innerHTML = '';
+    expired.classList.add('show');
+    return;
+  }
+
+  expired.classList.remove('show');
+
+  const diasParaSolicitar = getDiasParaSolicitar();
+  if (!diasParaSolicitar.length) {
+    container.innerHTML = '';
+    return;
+  }
+
+  container.innerHTML = diasParaSolicitar.map(r => {
+    const isFds   = r.tipo === 'fds';
+    const btnCls  = isFds ? 'purple' : 'green';
+    const formUrl = (r.dia === 6 || r.dia === 0) ? FORM_FDS : FORM_SEMANA;
+    return `
+      <div class="alert-card">
+        <div class="alert-title">⏰ Prazo aberto agora!</div>
+        <div class="alert-body">Hoje é dia de solicitar o almoço do plantão de <strong>${r.nome}</strong>.</div>
+        <div class="countdown-row">
+          <div class="countdown-box" id="cd-${r.dia}">00:00:00</div>
+          <div class="countdown-label">restantes para fechar</div>
+        </div>
+        <a href="${formUrl}" target="_blank" class="btn-solicitar ${btnCls}">
+          ${isFds ? '🌅' : '💼'} Solicitar agora →
+        </a>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── COUNTDOWN ──
+function updateCountdowns() {
+  const now = new Date();
+  const dl  = new Date(); dl.setHours(16,0,0,0);
+  const diff = dl - now;
+  if (diff <= 0) return;
+
+  const totalSec = Math.floor(diff / 1000);
+  const hh = Math.floor(totalSec / 3600);
+  const mm = Math.floor((totalSec % 3600) / 60);
+  const ss = totalSec % 60;
+  const txt = `${pad(hh)}:${pad(mm)}:${pad(ss)}`;
+
+  document.querySelectorAll('[id^="cd-"]').forEach(el => el.textContent = txt);
+}
+
+// ── IndexedDB ──
+function openDB() {
+  return new Promise((res,rej) => {
+    const req = indexedDB.open('hemo_db', 2);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('prefs'))    db.createObjectStore('prefs');
+      if (!db.objectStoreNames.contains('notified')) db.createObjectStore('notified');
+    };
+    req.onsuccess = e => res(e.target.result);
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+
+async function savePrefs(prefs) {
+  const db = await openDB();
+  return new Promise((res,rej) => {
+    const req = db.transaction('prefs','readwrite').objectStore('prefs').put(prefs,'settings');
+    req.onsuccess = () => res();
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+
+async function loadPrefs() {
+  try {
+    const db = await openDB();
+    return new Promise((res,rej) => {
+      const req = db.transaction('prefs','readonly').objectStore('prefs').get('settings');
+      req.onsuccess = e => res(e.target.result || { notif1h: true, notif30m: false });
+      req.onerror   = e => rej(e.target.error);
+    });
+  } catch { return { notif1h: true, notif30m: false }; }
+}
+
+// ── SERVICE WORKER ──
+let swReg = null;
+
+async function registerSW() {
+  if (!('serviceWorker' in navigator)) return;
+  try {
+    swReg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+    if ('periodicSync' in swReg) {
+      try { await swReg.periodicSync.register('hemo-daily', { minInterval: 60*60*1000 }); } catch{}
+    }
+    if ('sync' in swReg) {
+      try { await swReg.sync.register('hemo-check'); } catch{}
+    }
+  } catch (err) { console.warn('[PWA] SW erro:', err); }
+}
+
+async function sendAlarmsToSW() {
+  if (!swReg) return;
+  const prefs = await loadPrefs();
+  const sw = swReg.active || swReg.waiting || swReg.installing;
+  if (sw) sw.postMessage({ type: 'SCHEDULE_NOTIFS', prefs: { ...prefs, appUrl: APP_URL } });
+  if (swReg.active) swReg.active.postMessage({ type: 'CHECK_NOW' });
+}
+
+// ── NOTIFICAÇÕES ──
+function updateNotifUI(perm) {
+  const btn = document.getElementById('notifBtn');
+  const ok  = document.getElementById('notifOk');
+  if (perm === 'granted') {
+    btn.style.display = 'none';
+    ok.classList.add('show');
+  } else if (perm === 'denied') {
+    btn.textContent = '❌ Permissão negada — ative nas configurações';
+    btn.style.background = '#ccc';
+  }
+}
+
+async function requestNotifPermission() {
+  if (!('Notification' in window)) { showToast('Navegador não suporta notificações.'); return; }
+  const perm = await Notification.requestPermission();
+  updateNotifUI(perm);
+  if (perm === 'granted') {
+    showToast('✅ Notificações ativadas! Lembrete às 15h.');
+    const prefs = await loadPrefs();
+    await savePrefs({ ...prefs, notif1h: true, appUrl: APP_URL });
+    await sendAlarmsToSW();
+  } else {
+    showToast('❌ Ative a permissão nas configurações do celular.');
+  }
+}
+
+async function handleToggle(el, tipo) {
+  const prefs = await loadPrefs();
+  if (tipo === '1h')  prefs.notif1h  = el.checked;
+  if (tipo === '30m') prefs.notif30m = el.checked;
+  prefs.appUrl = APP_URL;
+  await savePrefs(prefs);
+
+  if (el.checked) {
+    showToast(`🔔 Lembrete ${tipo === '1h' ? '1 hora' : '30 min'} antes ativado`);
+    if (Notification.permission === 'granted') await sendAlarmsToSW();
+    else await requestNotifPermission();
+  } else {
+    showToast(`🔕 Lembrete desativado`);
+  }
+}
+
+// ── PWA INSTALL ──
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installCard').style.display = 'block';
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installCard').style.display = 'none';
+  showToast('✅ App instalado!');
+});
+
+async function installPWA() {
+  if (!deferredPrompt) { showToast('Use "Adicionar à tela inicial" no menu do navegador.'); return; }
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  if (outcome === 'accepted') showToast('✅ Instalando...');
+}
+
+// ── INIT ──
+(async () => {
+  renderHeader();
+  renderRules();
+  renderAlerts();
+  updateCountdowns();
+
+  // Relógio
+  setInterval(() => {
+    renderHeader();
+    updateCountdowns();
+    // Re-render alerts a cada minuto
+  }, 1000);
+
+  setInterval(() => {
+    renderAlerts();
+  }, 60000);
+
+  // SW
+  await registerSW();
+
+  // Prefs
+  const prefs = await loadPrefs();
+  document.getElementById('toggle1h').checked  = prefs.notif1h  ?? true;
+  document.getElementById('toggle30m').checked = prefs.notif30m ?? false;
+
+  // Notif UI
+  if ('Notification' in window) {
+    updateNotifUI(Notification.permission);
+    if (Notification.permission === 'granted') {
+      setTimeout(() => sendAlarmsToSW(), 1200);
+    }
+  }
+})();
+</script>
+</body>
+</html>
